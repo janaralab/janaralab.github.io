@@ -147,7 +147,6 @@
                   <th>Authors</th>
                   <th>Title</th>
                   <th>Venue</th>
-                  <th>Type</th>
                   <th>Year</th>
                   <th>Read the paper</th>
               </tr>
@@ -206,13 +205,12 @@
 
                 var year = paper.info.year;
                 var venue = paper.info.venue;
-                var type = paper.info.type;
 
                 var pdfLink = '';
               if (paper.info.ee && paper.info.ee.indexOf('http') === 0) {
                 pdfLink = '<a href="' + paper.info.ee + '" target="_blank">Paper</a>';
               }
-              return [authors, title, venue, type, year, pdfLink]
+              return [authors, title, venue, year, pdfLink]
               });
             }
           },
