@@ -144,8 +144,11 @@
           <table id="papers">
             <thead>
               <tr>
-                  <th>Title</th>
                   <th>Authors</th>
+                  <th>Title</th>
+                  <th>Venue</th>
+                  <th>Type</th>
+                  <th>Year</th>
                   <th>Read the paper</th>
               </tr>
             </thead>
@@ -200,16 +203,22 @@
                 var authors = paper.info.authors.author.map(function(author) {
                   return author.text;
                 }).join(', ');
+
+                var year = paper.info.year;
+                var venue = paper.info.venue;
+                var type = paper.info.type;
+
                 var pdfLink = '';
               if (paper.info.ee && paper.info.ee.indexOf('http') === 0) {
                 pdfLink = '<a href="' + paper.info.ee + '" target="_blank">Paper</a>';
               }
-              return [title, authors, pdfLink];
+              return [authors, title, venue, type, year, pdfLink]
               });
             }
           },
           "searching": false,
-          "info": false
+          "info": false,
+          "order":[[3, 'desc']]
         });
       });
     </script>
