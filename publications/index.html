@@ -137,122 +137,25 @@
     
         </div>
       </div><!-- End Breadcrumbs -->
-    
-      <p><span>TBA</span></p>
 
-      <!--<section id="publications">
+      <section id="publications">
         <div class="container">
-          <h1>Journals</h1>
-          <table id="journals">
+          <!--<h1>Journals</h1>-->
+          <table id="papers">
             <thead>
               <tr>
-                  <th>APA References</th>
+                  <th>Title</th>
+                  <th>Authors</th>
                   <th>Read the paper</th>
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td>Sgueglia, A., Di Sorbo, A., Visaggio, C. A., & Canfora, G. (2022). <b>A systematic literature review of iot time series anomaly detection solutions</b>. Future Generation Computer Systems.</td>
-                <td><a href="https://doi.org/10.1016/j.future.2022.04.005">Paper</td>
-              </tr>
-              <tr>
-                <td>Sgueglia, A., Di Sorbo, A., Visaggio, C. A., & Canfora, G. (2022). <b>A systematic literature review of iot time series anomaly detection solutions</b>. Future Generation Computer Systems.</td>
-                <td><a href="https://doi.org/10.1016/j.future.2022.04.005">Paper</td>
-              </tr>
             </tbody>
           </table>
-    
-          <h1>Conferences</h1>
-          <table id="conferences">
-            <thead>
-              <tr>
-                  <th>APA References</th>
-                  <th>Read the paper</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Sgueglia, A., Di Sorbo, A., Visaggio, C. A., & Canfora, G. (2022). <b>A systematic literature review of iot time series anomaly detection solutions</b>. Future Generation Computer Systems.</td>
-                <td><a href="https://doi.org/10.1016/j.future.2022.04.005">Paper</td>
-              </tr>
-            </tbody>
-          </table>
-    
-          <h1>Tools</h1>
-          <table id="tools">
-            <thead>
-              <tr>
-                  <th>APA References</th>
-                  <th>Read the paper</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Sgueglia, A., Di Sorbo, A., Visaggio, C. A., & Canfora, G. (2022). <b>A systematic literature review of iot time series anomaly detection solutions</b>. Future Generation Computer Systems.</td>
-                <td><a href="https://doi.org/10.1016/j.future.2022.04.005">Paper</td>
-              </tr>
-            </tbody>
-          </table>
-    
-          <h1>Technical reports</h1>
-          <table id="technical_reports">
-            <thead>
-              <tr>
-                  <th>APA References</th>
-                  <th>Read the paper</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Sgueglia, A., Di Sorbo, A., Visaggio, C. A., & Canfora, G. (2022). <b>A systematic literature review of iot time series anomaly detection solutions</b>. Future Generation Computer Systems.</td>
-                <td><a href="https://doi.org/10.1016/j.future.2022.04.005">Paper</td>
-              </tr>
-            </tbody>
-          </table>
-    
-          <h1>Books</h1>
-          <table id="books">
-            <thead>
-              <tr>
-                  <th>APA References</th>
-                  <th>Read the paper</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Sgueglia, A., Di Sorbo, A., Visaggio, C. A., & Canfora, G. (2022). <b>A systematic literature review of iot time series anomaly detection solutions</b>. Future Generation Computer Systems.</td>
-                <td><a href="https://doi.org/10.1016/j.future.2022.04.005">Paper</td>
-              </tr>
-            </tbody>
-          </table>
-    
-          <h1>Book chapters</h1>
-          <table id="book_chapters">
-            <thead>
-              <tr>
-                  <th>APA References</th>
-                  <th>Read the paper</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Sgueglia, A., Di Sorbo, A., Visaggio, C. A., & Canfora, G. (2022). <b>A systematic literature review of iot time series anomaly detection solutions</b>. Future Generation Computer Systems.</td>
-                <td><a href="https://doi.org/10.1016/j.future.2022.04.005">Paper</td>
-              </tr>
-            </tbody>
-          </table>
-    
         </div>
       </section>
     
-    </main>--><!-- End #main -->
-
-    <!-- ======= Footer ======= -->
-    <!--<footer id="footer" class="footer">
-      <div class="footer-content position-relative">
-        <div class="container">
-    </footer>-->
-    <!-- End Footer -->
+    </main><!-- End #main -->
 
     <a
       href="#"
@@ -283,12 +186,33 @@
     <script src="../static/js/main.js"></script>
 
     <script>
-      $(document).ready(function () {
-        $("table").DataTable({
-          info: false,
-          searching: false,
+      $(document).ready(function() {
+        $('#papers').DataTable({
+          "ajax": {
+            "url": 'https://dblp.org/search/publ/api?q=author:Corrado%20Aaron%20Visaggio&format=json',
+            "dataSrc": function(json) {
+              var papers = json.result.hits.hit;
+              return papers.map(function(paper) {
+                var title = paper.info.title;
+                if (title.endsWith('.')) {
+                title = title.slice(0, -1);
+              }
+                var authors = paper.info.authors.author.map(function(author) {
+                  return author.text;
+                }).join(', ');
+                var pdfLink = '';
+              if (paper.info.ee && paper.info.ee.indexOf('http') === 0) {
+                pdfLink = '<a href="' + paper.info.ee + '" target="_blank">Paper</a>';
+              }
+              return [title, authors, pdfLink];
+              });
+            }
+          },
+          "searching": false,
+          "info": false
         });
       });
     </script>
+
   </body>
 </html>
