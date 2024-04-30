@@ -141,19 +141,7 @@
       <section id="publications">
         <div class="container">
           <!--<h1>Journals</h1>-->
-          <table id="papers">
-            <thead>
-              <tr>
-                  <th>Authors</th>
-                  <th>Title</th>
-                  <th>Venue</th>
-                  <th>Year</th>
-                  <th>Read the paper</th>
-              </tr>
-            </thead>
-            <tbody>
-            </tbody>
-          </table>
+          <table id="papers"></table>
         </div>
       </section>
     
@@ -217,7 +205,14 @@
           "searching": false,
           "info": false,
           "order":[[3, 'desc']],
-          "scrollX": true
+          "scrollX": true,
+          "columns": [
+        { "title": "Authors" },
+        { "title": "Title" },
+        { "title": "Venue" },
+        { "title": "Year" },
+        { "title": "PDF Link" }
+      ]
         });
       });
     </script>
