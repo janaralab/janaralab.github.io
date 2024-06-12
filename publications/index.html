@@ -177,44 +177,64 @@
 
     <script>
       $(document).ready(function() {
-        $('#papers').DataTable({
-          "ajax": {
-            "url": 'https://dblp.org/search/publ/api?q=author:Corrado%20Aaron%20Visaggio&format=json',
-            "dataSrc": function(json) {
-              var papers = json.result.hits.hit;
-              return papers.map(function(paper) {
-                var title = paper.info.title;
-                if (title.endsWith('.')) {
+  $('#papers').DataTable({
+    "ajax": {
+      "url": 'https://dblp.org/search/publ/api?q=aaron%20visaggio&h=200&format=json',
+      "dataSrc": function(json) {
+        var papers = [];
+
+        try {
+          if (json.result && json.result.hits && Array.isArray(json.result.hits.hit)) {
+            papers = json.result.hits.hit;
+            
+            return papers.map(function(paper) {
+              // Ensure that necessary properties exist
+              var title = paper.info.title || "Unknown Title";
+              if (title.endsWith('.')) {
                 title = title.slice(0, -1);
               }
-                var authors = paper.info.authors.author.map(function(author) {
-                  return author.text;
+
+              var authors = "Unknown Authors";
+              if (paper.info.authors && Array.isArray(paper.info.authors.author)) {
+                authors = paper.info.authors.author.map(function(author) {
+                  return author && author.text ? author.text : "Unknown Author";
                 }).join(', ');
+              }
 
-                var year = paper.info.year;
-                var venue = paper.info.venue;
+              var year = paper.info.year || "Unknown Year";
+              var venue = paper.info.venue || "Unknown Venue";
 
-                var pdfLink = '';
-              if (paper.info.ee && paper.info.ee.indexOf('http') === 0) {
+              var pdfLink = '';
+              if (paper.info.ee && typeof paper.info.ee === 'string' && paper.info.ee.startsWith('http')) {
                 pdfLink = '<a href="' + paper.info.ee + '" target="_blank">Paper</a>';
               }
-              return [authors, title, venue, year, pdfLink]
-              });
-            }
-          },
-          "searching": false,
-          "info": false,
-          "order":[[3, 'desc']],
-          "scrollX": true,
-          "columns": [
-        { "title": "Authors" },
-        { "title": "Title" },
-        { "title": "Venue" },
-        { "title": "Year" },
-        { "title": "PDF Link" }
-      ]
-        });
-      });
+
+              return [authors, title, venue, year, pdfLink];
+            });
+          } else {
+            console.error("Invalid data structure", json);
+            return [];
+          }
+        } catch (error) {
+          console.error("An error occurred while processing the papers data:", error);
+          return [];
+        }
+      }
+    },
+    "searching": false,
+    "info": false,
+    "order": [[3, 'desc']],
+    "scrollX": true,
+    "columns": [
+      { "title": "Authors" },
+      { "title": "Title" },
+      { "title": "Venue" },
+      { "title": "Year" },
+      { "title": "PDF Link" }
+    ],
+  });
+});
+
     </script>
 
   </body>
