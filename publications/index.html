@@ -180,7 +180,7 @@
     <script type="text/javascript" charset="utf8" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
     <script type="text/javascript" charset="utf8" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
     <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/1.7.1/js/buttons.html5.min.js"></script>
-    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/1.7.1/js/buttons.print.min.js"></script>
+
 
     <!-- Template Main JS File -->
     <script src="../static/js/main.js"></script>
@@ -246,11 +246,13 @@
     "buttons": [
       {
         extend: 'excelHtml5',
-        text: 'Export to excel',
+        text: '<i class="fa-solid fa-file-excel"></i>',
+        titleAttr: 'Export to excel'
       },
       {
         extend: 'pdfHtml5',
-        text: 'Export to pdf',
+        text: '<i class="fa-solid fa-file-pdf"></i>',
+        titleAttr: 'Export to pdf',
       }
   ]
   });
