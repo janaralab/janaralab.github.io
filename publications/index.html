@@ -251,9 +251,9 @@
               exportOptions: {
                 columns: ':visible',
                 format: {
-                    body: function(data, row, column, node) {
-                        return column === 4 ? $(data).attr('href') : data;
-                    }
+                  body: function(data, row, column, node) {
+                    return column === 4 ? $(data).attr('href') : data;
+                  }
                 }
               }
             },
@@ -261,14 +261,33 @@
               extend: 'pdfHtml5',
               text: '<i class="fa-solid fa-file-pdf"></i>',
               titleAttr: 'Export to pdf',
-              exportOptions: {
-                columns: ':visible',
-                format: {
-                    body: function(data, row, column, node) {
-                        return column === 4 ? $(data).attr('href') : data;
+              customize: function(doc) {
+                    var body = doc.content[1].table.body;
+                    body.forEach(function(row) {
+                        row.forEach(function(cell) {
+                            if (typeof cell.text === 'string' && cell.text.startsWith('http')) {
+                                cell.text = {
+                                    text: 'PDF Link',
+                                    link: cell.text,
+                                    color: 'blue',
+                                    decoration: 'underline'
+                                };
+                            }
+                        });
+                    });
+                },
+                exportOptions: {
+                    columns: ':visible',
+                    format: {
+                        body: function(data, row, column, node) {
+                            if (column === 4) {
+                                var url = $(data).attr('href');
+                                return url ? url : 'No link';
+                            }
+                            return data;
+                        }
                     }
                 }
-              }
             }
         ]
         });
