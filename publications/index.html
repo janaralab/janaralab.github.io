@@ -247,12 +247,28 @@
       {
         extend: 'excelHtml5',
         text: '<i class="fa-solid fa-file-excel"></i>',
-        titleAttr: 'Export to excel'
+        titleAttr: 'Export to excel',
+        exportOptions: {
+          columns: ':visible',
+          format: {
+              body: function(data, row, column, node) {
+                  return column === 4 ? $(data).attr('href') : data;
+              }
+          }
+        }
       },
       {
         extend: 'pdfHtml5',
         text: '<i class="fa-solid fa-file-pdf"></i>',
         titleAttr: 'Export to pdf',
+        exportOptions: {
+          columns: ':visible',
+          format: {
+              body: function(data, row, column, node) {
+                  return column === 4 ? $(data).attr('href') : data;
+              }
+          }
+        }
       }
   ]
   });
