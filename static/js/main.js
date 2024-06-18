@@ -209,4 +209,122 @@ document.addEventListener('DOMContentLoaded', () => {
     aos_init();
   });
 
+  $('#papers').DataTable({
+    "ajax": {
+      "url": 'https://dblp.org/search/publ/api?q=aaron%20visaggio&h=200&format=json',
+      "dataSrc": function(json) {
+        var papers = [];
+
+        try {
+          if (json.result && json.result.hits && Array.isArray(json.result.hits.hit)) {
+            papers = json.result.hits.hit;
+            
+            return papers.map(function(paper) {
+              var title = paper.info.title || "Unknown Title";
+              if (title.endsWith('.')) {
+                title = title.slice(0, -1);
+              }
+
+              var authors = "Unknown Authors";
+              if (paper.info.authors && Array.isArray(paper.info.authors.author)) {
+                authors = paper.info.authors.author.map(function(author) {
+                  return author && author.text ? author.text : "Unknown Author";
+                }).join(', ');
+              }
+
+              var year = paper.info.year || "Unknown Year";
+              var venue = paper.info.venue || "Unknown Venue";
+
+              var pdfLink = '';
+              if (paper.info.ee && typeof paper.info.ee === 'string' && paper.info.ee.startsWith('http')) {
+                pdfLink = '<a href="' + paper.info.ee + '" target="_blank">Paper</a>';
+              }
+
+              return [authors, title, venue, year, pdfLink];
+            });
+          } else {
+            console.error("Invalid data structure", json);
+            return [];
+          }
+        } catch (error) {
+          console.error("An error occurred while processing the papers data:", error);
+          return [];
+        }
+      }
+    },
+    "searching": false,
+    "info": false,
+    "order": [[3, 'desc']],
+    "scrollX": true,
+    "columns": [
+      { "title": "Authors" },
+      { "title": "Title" },
+      { "title": "Venue" },
+      { "title": "Year" },
+      { "title": "PDF Link" }
+    ],
+    "dom": 'Bfrtip',
+    "buttons": [
+      {
+        extend: 'excelHtml5',
+        text: '<i class="fa-solid fa-file-excel"></i>',
+        titleAttr: 'Export to excel',
+        customize: function( xlsx ) {
+
+          var sheet = xlsx.xl.worksheets['sheet1.xml'];
+
+          $('row c', sheet).each( function () {
+
+              if ( $('is t', this).text().indexOf("http") === 0 ) {
+
+                  $(this).attr('t', 'str');
+                  $(this).append('<f>' + 'HYPERLINK("'+$('is t', this).text()+'","PDF Link")'+ '</f>');
+                  $('is', this).remove();
+                  $(this).attr( 's', '4' );
+              }
+          });
+          },
+        exportOptions: {
+          columns: ':visible',
+          format: {
+            body: function(data, row, column, node) {
+              return column === 4 ? $(data).attr('href') : data;
+            }
+          }
+        }
+      },
+      {
+        extend: 'pdfHtml5',
+        text: '<i class="fa-solid fa-file-pdf"></i>',
+        titleAttr: 'Export to pdf',
+        customize: function(doc) {
+              var body = doc.content[1].table.body;
+              body.forEach(function(row) {
+                  row.forEach(function(cell) {
+                      if (typeof cell.text === 'string' && cell.text.startsWith('http')) {
+                          cell.text = {
+                              text: 'PDF Link',
+                              link: cell.text,
+                              color: 'blue',
+                              decoration: 'underline'
+                          };
+                      }
+                  });
+              });
+          },
+          exportOptions: {
+              columns: ':visible',
+              format: {
+                  body: function(data, row, column, node) {
+                      if (column === 4) {
+                          var url = $(data).attr('href');
+                          return url ? url : 'No link';
+                      }
+                      return data;
+                  }
+              }
+          }
+      }
+  ]
+  });
 });
