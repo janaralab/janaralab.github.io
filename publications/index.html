@@ -198,7 +198,6 @@
                   papers = json.result.hits.hit;
                   
                   return papers.map(function(paper) {
-                    // Ensure that necessary properties exist
                     var title = paper.info.title || "Unknown Title";
                     if (title.endsWith('.')) {
                       title = title.slice(0, -1);
@@ -252,19 +251,13 @@
 
                 var sheet = xlsx.xl.worksheets['sheet1.xml'];
 
-                // Loop over all cells in sheet
                 $('row c', sheet).each( function () {
 
-                    // if cell starts with http
                     if ( $('is t', this).text().indexOf("http") === 0 ) {
 
-                        // (2.) change the type to `str` which is a formula
                         $(this).attr('t', 'str');
-                        //append the formula
                         $(this).append('<f>' + 'HYPERLINK("'+$('is t', this).text()+'","PDF Link")'+ '</f>');
-                        //remove the inlineStr
                         $('is', this).remove();
-                        // (3.) underline
                         $(this).attr( 's', '4' );
                     }
                 });
