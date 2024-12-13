@@ -210,7 +210,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   $('#papers').DataTable({
-    "ajax": {
+    /*"ajax": {
       "url": 'https://dblp.org/search/publ/api?q=aaron%20visaggio&h=200&format=json',
       "dataSrc": function(json) {
         var papers = [];
@@ -251,7 +251,58 @@ document.addEventListener('DOMContentLoaded', () => {
           return [];
         }
       }
-    },
+    },*/
+    "ajax": function(data, callback, settings) {
+  const url1 = 'https://dblp.org/search/publ/api?q=aaron%20visaggio&h=200&format=json';
+  const url2 = 'https://dblp.org/search/publ/api?q=andrea%di%sorbo&h=200&format=json';
+
+  // Fetch data from both URLs
+  Promise.all([fetch(url1).then(res => res.json()), fetch(url2).then(res => res.json())])
+    .then(responses => {
+      const [data1, data2] = responses;
+
+      // Extract papers from both responses
+      const papers1 = data1.result?.hits?.hit || [];
+      const papers2 = data2.result?.hits?.hit || [];
+
+      // Merge and deduplicate papers
+      const normalizeTitle = (title) => title.trim().toLowerCase();
+      const seen = new Set();
+      const mergedPapers = [...papers1, ...papers2].filter(paper => {
+        const normalizedTitle = normalizeTitle(paper.info.title || "Unknown Title");
+        if (seen.has(normalizedTitle)) return false;
+        seen.add(normalizedTitle);
+        return true;
+      });
+
+      // Transform data into DataTable format
+      const formattedPapers = mergedPapers.map(paper => {
+        const title = paper.info.title || "Unknown Title";
+        //const authors = paper.info.authors?.author.map(author => author.text).join(', ') || "Unknown Authors";
+        let authors = "Unknown Authors";
+        if (paper.info.authors?.author) {
+          // Check if authors is an array or a single object
+          if (Array.isArray(paper.info.authors.author)) {
+            authors = paper.info.authors.author.map(author => author.text).join(', ');
+          } else if (typeof paper.info.authors.author.text === "string") {
+            authors = paper.info.authors.author.text; // Single author case
+          }
+        }
+        const year = paper.info.year || "Unknown Year";
+        const venue = paper.info.venue || "Unknown Venue";
+        const pdfLink = paper.info.ee ? `<a href="${paper.info.ee}" target="_blank">Paper</a>` : "No Link";
+        return [authors, title, venue, year, pdfLink];
+      });
+
+      // Pass data to DataTable
+      callback({ data: formattedPapers });
+    })
+    .catch(error => {
+      console.error("An error occurred while fetching and processing data:", error);
+      callback({ data: [] }); // Pass empty data in case of an error
+    });
+},
+
     "searching": false,
     "info": false,
     "order": [[3, 'desc']],
